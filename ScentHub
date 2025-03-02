@@ -1,0 +1,107 @@
+import React, { useState } from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Chatbot from "./components/Chatbot";
+import Login from "./components/Login";
+import Scents from "./components/Scents";
+import ScentDetail from "./components/ScentDetail";
+
+const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  return (
+    <Router>
+      <div className="bg-white text-black min-h-screen flex flex-col items-center">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/home" />
+              ) : (
+                <Login onLogin={() => setIsAuthenticated(true)} />
+              )
+            }
+          />
+          <Route path="/home" element={<Scents />} />
+          <Route path="/scent/:id" element={<ScentDetail />} />
+        </Routes>
+        <Chatbot />
+        <footer className="p-4 text-center">
+          Contact us: +91 8484927736
+        </footer>
+      </div>
+    </Router>
+  );
+};
+
+export default App;
+
+// Login Component
+const Login = ({ onLogin }) => {
+  return (
+    <div className="flex flex-col items-center justify-center h-screen">
+      <h1 className="text-2xl font-bold">Welcome to ScentInc</h1>
+      <p className="text-gray-600">Discover the history of perfumes and explore our scents.</p>
+      <Button onClick={onLogin} className="mt-4">Login</Button>
+    </div>
+  );
+};
+
+// Scents Component
+const Scents = () => {
+  const [scents, setScents] = useState([
+    { id: 1, name: "Aether", symbol: "Δ", notes: "Woody, Musky", price: "$50" },
+    { id: 2, name: "Zephyr", symbol: "Ω", notes: "Floral, Citrus", price: "$65" }
+  ]);
+
+  const addScent = () => {
+    const newScent = { id: scents.length + 1, name: "New Scent", symbol: "Ψ", notes: "Fresh, Spicy", price: "$70" };
+    setScents([...scents, newScent]);
+  };
+
+  return (
+    <div className="p-8">
+      <h2 className="text-xl font-bold">Our Scents</h2>
+      <Button onClick={addScent} className="mb-4">Add Scent</Button>
+      <div className="grid grid-cols-2 gap-4 mt-4">
+        {scents.map(scent => (
+          <Card key={scent.id} className="cursor-pointer p-4" onClick={() => window.location.href=`/scent/${scent.id}`}>
+            <CardContent className="text-center">
+              <h3 className="text-lg font-semibold">{scent.symbol} - {scent.name}</h3>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Scent Detail Component
+const ScentDetail = () => {
+  const [scent, setScent] = useState({ name: "Aether", symbol: "Δ", notes: "Woody, Musky", price: "$50" });
+
+  const updateScent = () => {
+    setScent({ ...scent, notes: "Updated Notes", price: "$55" });
+  };
+
+  return (
+    <div className="p-8">
+      <h2 className="text-xl font-bold">{scent.symbol} - {scent.name}</h2>
+      <p className="mt-2">Notes: {scent.notes}</p>
+      <p className="mt-2">Price: {scent.price}</p>
+      <Button onClick={updateScent} className="mt-4">Modify Details</Button>
+    </div>
+  );
+};
+
+// Chatbot Component
+const Chatbot = () => {
+  return (
+    <div className="fixed bottom-4 right-4 p-4 bg-gray-200 rounded-lg shadow-lg">
+      <p>Chat with us</p>
+      <Button onClick={() => alert('Contact us at +91 8484927736')}>Contact</Button>
+    </div>
+  );
+};
